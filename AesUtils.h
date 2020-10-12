@@ -5,9 +5,6 @@
 #ifndef SECURITYLAB3_AESUTILS_H
 #define SECURITYLAB3_AESUTILS_H
 
-#define LITTLE_ENDIAN 0
-#define BIG_ENDIAN    1
-
 #include <iostream>
 #include <cstring>
 #include <numeric>
@@ -16,23 +13,11 @@
 #include <functional>
 #include <vector>
 
-using byte_t = unsigned char;
+unsigned char mult_with_shift(unsigned char x);
 
-byte_t mult_by_2(byte_t x);
+unsigned char mult_req(unsigned char x);
 
-byte_t mult_by_8(byte_t x);
-
-const std::unordered_map<byte_t, std::function<byte_t(byte_t)>> mapper = {
-        {0x1, [](byte_t x) { return x; }},
-        {0x2, [](byte_t x){ return (x < 128) ? x << 1 : (x << 1 & 0xff) ^ 0x1b; }},
-        {0x3, [](byte_t x) { return mult_by_2(x) ^ x; }},
-        {0x9, [](byte_t x) { return mult_by_8(x) ^ x; }},
-        {0xb, [](byte_t x) { return mult_by_8(x) ^ mult_by_2(x) ^ x; }},
-        {0xd, [](byte_t x) { return mult_by_8(x) ^ mult_by_2(mult_by_2(x)) ^ x; }},
-        {0xe, [](byte_t x) { return mult_by_8(x) ^ mult_by_2(mult_by_2(x)) ^ mult_by_2(x); }},
-};
-
-byte_t vector_mult(const std::array<byte_t, 4>& v1, std::array<byte_t, 4>&& v2);
+unsigned char vector_mult(const std::array<unsigned char, 4>& v1, std::array<unsigned char, 4>&& v2);
 
 const std::vector<std::vector<std::string>> SBOX = {
         { "63", "7c", "77", "7b", "f2", "6b", "6f", "c5", "30", "01", "67", "2b", "fe", "d7", "ab", "76" },

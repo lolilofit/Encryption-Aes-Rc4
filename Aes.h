@@ -18,9 +18,9 @@ public:
 
     Aes(const Aes &) = default;
 
-    std::vector<byte_t> state;
+    std::vector<unsigned char> state;
 
-    std::vector<std::vector<byte_t>> keys;
+    std::vector<std::vector<unsigned char>> keys;
 
     bool decrypt;
 
@@ -32,20 +32,14 @@ public:
 
     void add_round_key(int r);
 
-    void substitute_bytes();
+    void substitute_bytes(bool is_decrypt);
 
-    void shift_rows();
+    void shift_row(int r_coef);
 
-    void shift_row(std::array<byte_t, 4>&& row, int k, int j);
+    void mix_columns_encrypt();
 
-    void mix_columns();
+    void mix_columns_decrypt();
 
-    byte_t hex(unsigned char ch) { return (ch - '0') % 39; }
-
-    byte_t sbox(byte_t x, bool decrypt = false) {
-        std::string s = (decrypt ? INV_SBOX : SBOX)[x >> 4][x & 15];
-        return hex(s[0]) << 4 | hex(s[1]);
-    }
 };
 
 
