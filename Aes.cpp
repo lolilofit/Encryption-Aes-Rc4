@@ -18,7 +18,7 @@ std::vector<unsigned char> Aes::encrypt() {
     shift_row(1);
     add_round_key(10);
 
-    return state;
+    return data;
 }
 
 std::vector<unsigned char> Aes::decrypt_f() {
@@ -34,7 +34,7 @@ std::vector<unsigned char> Aes::decrypt_f() {
     }
     add_round_key(0);
 
-    return state;
+    return data;
 }
 
 void Aes::key_expansion() {
@@ -55,42 +55,42 @@ void Aes::key_expansion() {
 }
 
 void Aes::add_round_key(int r) {
-    std::transform(begin(keys[r]), end(keys[r]), begin(state), begin(state), std::bit_xor<unsigned char>());
+    std::transform(begin(keys[r]), end(keys[r]), begin(data), begin(data), std::bit_xor<unsigned char>());
 }
 
 void Aes::substitute_bytes(bool is_decrypt) {
-    std::transform(begin(state), end(state), begin(state), [&](unsigned char x) {
+    std::transform(begin(data), end(data), begin(data), [&](unsigned char x) {
         std::string s = (is_decrypt ? INV_SBOX : SBOX)[x >> 4][x & 15];
         return (s[0] - '0') % 39 << 4 | (s[1] - '0') % 39; });
 }
 
 void Aes::shift_row(int r_coef) {
     for (int i = 1; i < 4; i++) {
-        std::array<unsigned char, 4> ar = {state[i], state[4 + i], state[8 + i], state[12 + i]};
+        std::array<unsigned char, 4> ar = {data[i], data[4 + i], data[8 + i], data[12 + i]};
 
         std::rotate(begin(ar), begin(ar) + (r_coef * i) % 4, end(ar));
-        for (int m = 0; m != 4; m++) { state[m * 4 + i] = ar[m]; }
+        for (int m = 0; m != 4; m++) { data[m * 4 + i] = ar[m]; }
     }
 }
 
 void Aes::mix_columns_encrypt() {
     for (int i = 0; i < 4; i++) {
-        const std::array<unsigned char, 4> column = {state[i * 4], state[i * 4 + 1], state[i * 4 + 2], state[i * 4 + 3]};
+        const std::array<unsigned char, 4> column = {data[i * 4], data[i * 4 + 1], data[i * 4 + 2], data[i * 4 + 3]};
 
-        state[i * 4] = vector_mult(column, {0x2, 0x3, 0x1, 0x1});
-        state[i * 4 + 1] = vector_mult(column, {0x1, 0x2, 0x3, 0x1});
-        state[i * 4 + 2] = vector_mult(column, {0x1, 0x1, 0x2, 0x3});
-        state[i * 4 + 3] = vector_mult(column, {0x3, 0x1, 0x1, 0x2});
+        data[i * 4] = vector_mult(column, {0x2, 0x3, 0x1, 0x1});
+        data[i * 4 + 1] = vector_mult(column, {0x1, 0x2, 0x3, 0x1});
+        data[i * 4 + 2] = vector_mult(column, {0x1, 0x1, 0x2, 0x3});
+        data[i * 4 + 3] = vector_mult(column, {0x3, 0x1, 0x1, 0x2});
     }
 }
 
 void Aes::mix_columns_decrypt() {
     for (int i = 0; i < 4; i++) {
-        const std::array<unsigned char, 4> column = {state[i * 4], state[i * 4 + 1], state[i * 4 + 2], state[i * 4 + 3]};
-        state[i * 4] = vector_mult(column, {0xe, 0xb, 0xd, 0x9});
-        state[i * 4 + 1] = vector_mult(column, {0x9, 0xe, 0xb, 0xd});
-        state[i * 4 + 2] = vector_mult(column, {0xd, 0x9, 0xe, 0xb});
-        state[i * 4 + 3] = vector_mult(column, {0xb, 0xd, 0x9, 0xe});
+        const std::array<unsigned char, 4> column = {data[i * 4], data[i * 4 + 1], data[i * 4 + 2], data[i * 4 + 3]};
+        data[i * 4] = vector_mult(column, {0xe, 0xb, 0xd, 0x9});
+        data[i * 4 + 1] = vector_mult(column, {0x9, 0xe, 0xb, 0xd});
+        data[i * 4 + 2] = vector_mult(column, {0xd, 0x9, 0xe, 0xb});
+        data[i * 4 + 3] = vector_mult(column, {0xb, 0xd, 0x9, 0xe});
     }
 }
 
@@ -107,7 +107,7 @@ void Aes::run_encode_decode_cycle(std::string &filename, std::string &key) {
         file.read(buffer, 16);
         std::string mes(buffer);
 
-        aes.state = {mes.begin(), mes.end()};
+        aes.data = {mes.begin(), mes.end()};
 
         std::vector<unsigned char> encrypted = aes.encrypt();
         std::string encrypted_s(encrypted.begin(), encrypted.end());

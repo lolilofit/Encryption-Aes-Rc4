@@ -28,7 +28,7 @@ std::string* AesHashing::hash_f(std::string &message, std::string &key) {
 
         std::string mes_chunk(buffer);
 
-        aes.state = {mes_chunk.begin(), mes_chunk.end()};
+        aes.data = {mes_chunk.begin(), mes_chunk.end()};
 
         std::vector<unsigned char> encoded = aes.encrypt();
 

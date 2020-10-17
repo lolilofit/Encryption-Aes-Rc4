@@ -13,12 +13,12 @@
 class Aes {
 public:
     Aes(const std::string& text, const std::string& cipher, bool decrypt = false)
-            : state({begin(text), end(text)}), keys({{begin(cipher), end(cipher)}}), decrypt(decrypt) {}
+            : data({begin(text), end(text)}), keys({{begin(cipher), end(cipher)}}), decrypt(decrypt) {}
     Aes() = default;
 
     Aes(const Aes &) = default;
 
-    std::vector<unsigned char> state;
+    std::vector<unsigned char> data;
 
     std::vector<std::vector<unsigned char>> keys;
 
