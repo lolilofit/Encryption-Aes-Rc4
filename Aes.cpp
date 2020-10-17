@@ -133,8 +133,8 @@ void Aes::run_aes(int argc, char *argv[]) {
     std::cout << "Enter key with length = 11" << std::endl;
     std::cin >> key;
 
-    if (key.size() != 11) {
-        std::cout << "Keylen != 11" << std::endl;
+    if (key.size() != 10) {
+        std::cout << "Keylen != 10" << std::endl;
         run_aes(argc, argv);
     }
 
