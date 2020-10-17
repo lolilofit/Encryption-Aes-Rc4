@@ -1,26 +1,25 @@
-#include <array>
+//
+// Created by User on 17.10.2020.
+//
+
+
 #include <sstream>
 #include "Aes.h"
-#include "Rc4.h"
+#include "AesHashing.h"
 
-std::string *hash_f(std::string &message, std::string &key) {
+std::string* AesHashing::hash_f(std::string &message, std::string &key) {
     std::string initial_message;
     Aes aes(initial_message, key);
-
-    char buffer[17];
-    buffer[16] = '\0';
 
     std::istringstream message_seq;
     message_seq.str(message);
 
-    int count_readen = 0;
+    char buffer[17];
+    buffer[16] = '\0';
 
     while (true) {
-        std::fill(std::begin(buffer), std::begin(buffer) + 16, ' ');
-        buffer[16] = '\0';
-
+        std::fill(std::begin(buffer), std::begin(buffer) + 16, '\0');
         message_seq.read(buffer, 16);
-        count_readen += 16;
 
         std::string mes_chunk(buffer);
 
@@ -30,19 +29,19 @@ std::string *hash_f(std::string &message, std::string &key) {
 
         aes.keys = {encoded};
 
-        if (count_readen > message.size()) {
+        if (!message_seq.eof()) {
             return new std::string(encoded.begin(), encoded.end());
         }
     }
 }
 
 
-void run_hashing() {
-    std::cout << std::endl << "--------------HASHING---------------" << std::endl;
-
-    std::cout << "Enter key with length = 11" << std::endl;
+void AesHashing::run_hashing() {
+    std::cout << "--------------HASHING---------------" << std::endl;
 
     std::string key;
+    std::cout << "Enter key with length = 11" << std::endl;
+
     std::cin >> key;
 
     if (key.size() != 11) {
@@ -60,12 +59,3 @@ void run_hashing() {
     std::cout << *hash_code;
 }
 
-int main(int argc, char *argv[]) {
-    run_hashing();
-
-    Aes::run_aes(argc, argv);
-
-    Rc4::run_rc4();
-
-    return 0;
-}

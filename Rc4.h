@@ -58,6 +58,8 @@ public:
     }
 
     static void run_rc4() {
+        std::cout << "----------Rc4--------------" << std::endl;
+
         int l = 3;
         std::cout << "enter key with length =  " << l << std::endl;
         auto *s_key = new unsigned char[l];

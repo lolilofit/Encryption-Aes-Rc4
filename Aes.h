@@ -40,6 +40,9 @@ public:
 
     void mix_columns_decrypt();
 
+    static void run_encode_decode_cycle(std::string &filename, std::string &key);
+
+    static void run_aes(int argc, char *argv[]);
 };
 
 

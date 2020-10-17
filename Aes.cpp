@@ -2,6 +2,7 @@
 // Created by User on 12.10.2020.
 //
 
+#include <fstream>
 #include "Aes.h"
 
 std::vector<unsigned char> Aes::encrypt() {
@@ -91,4 +92,51 @@ void Aes::mix_columns_decrypt() {
         state[i * 4 + 2] = vector_mult(column, {0xd, 0x9, 0xe, 0xb});
         state[i * 4 + 3] = vector_mult(column, {0xb, 0xd, 0x9, 0xe});
     }
+}
+
+void Aes::run_encode_decode_cycle(std::string &filename, std::string &key) {
+    std::fstream file;
+    file.open(filename, std::fstream::in);
+
+    char buffer[17];
+    buffer[16] = '\0';
+
+    Aes aes("", key);
+
+    while (!file.eof()) {
+        file.read(buffer, 16);
+        std::string mes(buffer);
+
+        aes.state = {mes.begin(), mes.end()};
+
+        std::vector<unsigned char> encrypted = aes.encrypt();
+        std::string encrypted_s(encrypted.begin(), encrypted.end());
+        std::cout << encrypted_s << std::endl;
+
+        std::vector<unsigned char> res = aes.decrypt_f();
+        std::string res_s(res.begin(), res.end());
+        std::cout << res_s << std::endl;
+
+        std::fill(std::begin(buffer), std::begin(buffer) + 16, '\0');
+    }
+
+    file.close();
+}
+
+
+void Aes::run_aes(int argc, char *argv[]) {
+    std::cout << std::endl << "------------AES------------" << std::endl;
+
+    std::string filename = argc == 2 ? argv[1] : R"(C:\Users\User\CLionProjects\securityLab3\file.txt)";
+
+    std::string key;
+    std::cout << "Enter key with length = 11" << std::endl;
+    std::cin >> key;
+
+    if (key.size() != 11) {
+        std::cout << "Keylen != 11" << std::endl;
+        run_aes(argc, argv);
+    }
+
+    run_encode_decode_cycle(filename, key);
 }
