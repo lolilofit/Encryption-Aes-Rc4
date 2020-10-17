@@ -11,15 +11,20 @@ std::string* AesHashing::hash_f(std::string &message, std::string &key) {
     std::string initial_message;
     Aes aes(initial_message, key);
 
-    std::istringstream message_seq;
-    message_seq.str(message);
-
     char buffer[17];
     buffer[16] = '\0';
 
+    std::istringstream message_seq;
+    message_seq.str(message);
+
+    int count_readen = 0;
+
     while (true) {
-        std::fill(std::begin(buffer), std::begin(buffer) + 16, '\0');
+        std::fill(std::begin(buffer), std::begin(buffer) + 16, ' ');
+        buffer[16] = '\0';
+
         message_seq.read(buffer, 16);
+        count_readen += 16;
 
         std::string mes_chunk(buffer);
 
@@ -29,19 +34,18 @@ std::string* AesHashing::hash_f(std::string &message, std::string &key) {
 
         aes.keys = {encoded};
 
-        if (!message_seq.eof()) {
+        if (count_readen > message.size()) {
             return new std::string(encoded.begin(), encoded.end());
         }
     }
 }
 
-
 void AesHashing::run_hashing() {
-    std::cout << "--------------HASHING---------------" << std::endl;
+    std::cout << std::endl << "--------------HASHING---------------" << std::endl;
 
-    std::string key;
     std::cout << "Enter key with length = 11" << std::endl;
 
+    std::string key;
     std::cin >> key;
 
     if (key.size() != 11) {
@@ -58,4 +62,5 @@ void AesHashing::run_hashing() {
 
     std::cout << *hash_code;
 }
+
 
